@@ -7,6 +7,8 @@ push dx
 push es
 push fs
 
+mov ax, si					; use ax's byte specific access
+
 cmp al, 0xFF					; Is 0xFF (null)?
 je .done						; Ignore
 

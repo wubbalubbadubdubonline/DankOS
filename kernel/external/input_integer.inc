@@ -32,8 +32,12 @@ mov di, .buffer
 	cmp cl, 10
 	je .loop
 	inc cl
+	push esi
+	xor esi, esi
+	mov si, ax
 	push 0x01
 	int 0x80
+	pop esi
 	sub al, '0'
 	stosb
 	jmp .loop
@@ -41,8 +45,12 @@ mov di, .buffer
 	cmp cl, 0
 	je .loop
 	mov al, 0x08
+	push esi
+	xor esi, esi
+	mov si, ax
 	push 0x01
 	int 0x80
+	pop esi
 	dec di
 	dec cl
 	jmp .loop

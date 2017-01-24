@@ -22,16 +22,23 @@ xor ecx, ecx
 	cmp ecx, ebx
 	je .loop
 	inc ecx
+	push esi
+	xor esi, esi
+	mov si, ax
 	push 0x01
 	int 0x80
+	pop esi
 	a32 o32 stosb
 	jmp .loop
 .backspace:
 	test ecx, ecx
 	jz .loop
-	mov al, 0x08
+	push esi
+	xor esi, esi
+	mov si, 0x08
 	push 0x01
 	int 0x80
+	pop esi
 	dec edi
 	dec ecx
 	jmp .loop

@@ -1,16 +1,18 @@
 print_integer_hex:
 
 ;   Prints a 32-bit integer number on screen in hexadecimal notation.
-;     number in EAX
+;     number in ESI
 ;     DL = 0 if not aligned or 1 if right aligned
 
 push eax
 push ebx
 push ecx
 push edx
+push esi
 push di
-push si
 push ds
+
+mov eax, esi				; 
 
 mov bx, KernelSpace
 mov ds, bx				; Point to kernel space
@@ -22,20 +24,21 @@ mov dl, 0xFF
 jmp .clear_buffer
 
 .right_align:
-mov dl, ' '
+	mov dl, ' '
 
 .clear_buffer:
 	mov cx, 8
 	mov di, .buffer
-	.clear_buffer_loop:
-		mov byte [di], dl
-		inc di
+
+.clear_buffer_loop:
+	mov byte [di], dl
+	inc di
 	loop .clear_buffer_loop
 	jmp .calculate
 
 .calculate:
-mov di, (.buffer+7)
-mov byte [di], '0'
+	mov di, (.buffer+7)
+	mov byte [di], '0'
 .loop:
 	xor edx, edx
 	mov ebx, 16
@@ -58,8 +61,8 @@ mov byte [di], '0'
 	int 0x80
 
 	pop ds
-	pop si
 	pop di
+	pop esi
 	pop edx
 	pop ecx
 	pop ebx

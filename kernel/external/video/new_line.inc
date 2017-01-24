@@ -4,11 +4,11 @@
 
 new_line:
 
-push ax
+push esi
 
-mov al, 0x0A
+mov si, 0x0A
 push 0x01
 int 0x80
 
-pop ax
+pop esi
 iret
