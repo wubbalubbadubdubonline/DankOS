@@ -2,19 +2,49 @@
 ;     The DankOS kernel. It contains core drivers and routines.
 ; *****************************************************************
 
-org 0x0500							; Bootloader loads us here (0000:0500)
+org 0x0010							; Bootloader loads us here (FFFF:0010)
 bits 16								; 16-bit Real mode
 
 ; **** Bootup routines ****
 
-%include 'kernel/internal/kernel/enter_unreal.inc'		; Enter Unreal Mode and set up segments
+; Flush registers
 
-push ds								; Enable the interrupt 0x80 for the system API
+xor eax, eax
+xor ebx, ebx
+xor ecx, ecx
+and edx, 0x000000FF		; (save boot drive)
+xor esi, esi
+xor edi, edi
+xor ebp, ebp
+
+; Setup segments
+
+cli
+mov ax, KernelSpace
+mov ds, ax
+mov es, ax
+mov fs, ax
+mov gs, ax
+mov ss, ax
+mov sp, 0x7FF0
+
+push ds
+
 xor ax, ax
 mov ds, ax
-mov word [0x0200], system_call
+
+mov word [0x0200], system_call		; Enable the interrupt 0x80 for the system API
 mov word [0x0202], KernelSpace
+
+mov word [0x006C], break_int		; Hook the break interrupt
+mov word [0x006E], KernelSpace
+
+mov word [0x0070], timer_int		; Hook the timer interrupt
+mov word [0x0072], KernelSpace
+
 pop ds
+
+sti
 
 mov byte [BootDrive], dl		; Save boot drive
 
@@ -23,13 +53,13 @@ int 0x80
 
 ; Prepare the screen
 
-push 0x80
+push 0x80				; Enter graphics mode
 int 0x80
 
-push 0x82
+push 0x82				; Leave graphics mode (this should fix a bug on some machines)
 int 0x80
 
-mov si, SplashScreen	; Display SplashScreen
+mov si, SplashScreen	; Display SplashScreen (to be replaced with a graphical splash)
 push 0x02
 int 0x80
 
@@ -77,6 +107,9 @@ BootDrive		db	0x00
 
 ;Includes (internal routines)
 
+%include 'kernel/internal/timer_int.inc'
+%include 'kernel/internal/break_int.inc'
+
 ;Video
 
 %include 'kernel/internal/video/draw_cursor.inc'
@@ -104,10 +137,6 @@ BootDrive		db	0x00
 
 %include 'kernel/internal/disk/floppy_read_sector.inc'
 %include 'kernel/internal/disk/floppy_write_sector.inc'
-
-;Kernel
-
-%include 'kernel/internal/kernel/gdt.inc'
 
 ;Includes (external routines)
 
@@ -172,7 +201,9 @@ BootDrive		db	0x00
 
 ; TO BE SORTED
 
-%include 'kernel/speaker.inc'
+%include 'kernel/external/beep.inc'
+%include 'kernel/external/stop_beep.inc'
+%include 'kernel/external/play_music.inc'
 %include 'kernel/external/compare_strings.inc'
 %include 'kernel/external/input_integer.inc'
 %include 'kernel/external/input_string.inc'
@@ -188,5 +219,6 @@ BootDrive		db	0x00
 %include 'kernel/external/upper_to_lowercase.inc'
 %include 'kernel/external/cut_string.inc'
 %include 'kernel/external/get_char.inc'
+%include 'kernel/external/sleep.inc'
 
 times 0x8000-($-$$)			db 0x00				; Pad reserved sectors with 0x00
