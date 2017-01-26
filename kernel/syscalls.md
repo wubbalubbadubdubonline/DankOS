@@ -1,27 +1,27 @@
 # DankOS Syscall Table (WIP)
 
 To make a system call, push the opcode onto the stack and move the arguments
-into si, di, (more to come) respectively, then call `int 0x80`
-
+into ESI, EDI, EAX, ECX respectively, then call `int 0x80`
+Return values will be in EDX
 
 | opcode | name | arguments| short description |
 | :---: | --- | --- | --- |
-| 0x0 | terminate_process | none | terminates the current process |
-| 0x1 | put_char | char | prints a single character |
-| 0x2 | print_string | str | prints a null terminated string |
-| 0x3 | new_line |  |  |
-| 0x4 | string_to_integer |  |  |
-| 0x5 | print_integer_hex |  |  |
-| 0x6 | print_integer |  |  |
-| 0x7 | input_integer |  |  |
-| 0x8 | compare_strings |  |  |
-| 0x9 | string_length |  |  |
-| 0xA | initialize_screen |  |  |
-| 0xB | disable_cursor |  |  |
-| 0xC | enable_cursor |  |  |
-| 0xD | get_cursor_position |  |  |
-| 0xE | set_cursor_position |  |  |
-| 0xF | center_print_string |  |  |
+| 0x00 | terminate_process | none | terminates the current process |
+| 0x01 | put_char | char | prints a single character |
+| 0x02 | print_string | str | prints a null terminated string from address str |
+| 0x03 | new_line | none | moves cursor to next line |
+| 0x04 | string_to_integer | str | converts string to int and places in eax |
+| 0x05 | print_integer_hex |  |  |
+| 0x06 | print_integer |  |  |
+| 0x07 | input_integer |  |  |
+| 0x08 | compare_strings |  |  |
+| 0x09 | string_length |  |  |
+| 0x0A | initialize_screen |  |  |
+| 0x0B | disable_cursor |  |  |
+| 0x0C | enable_cursor |  |  |
+| 0x0D | get_cursor_position |  |  |
+| 0x0E | set_cursor_position |  |  |
+| 0x0F | center_print_string |  |  |
 | 0x10 | input_string |  |  |
 | 0x11 | set_palette |  |  |
 | 0x12 | load_file |  |  |
@@ -33,8 +33,8 @@ into si, di, (more to come) respectively, then call `int 0x80`
 | 0x18 | pause |  |  |
 | 0x19 | allocate_memory |  |  |
 | 0x1A | cut_string |  |  |
-| 0x1B | (unused) | N/A | N/A |
-| 0x1C | (unused) | N/A | N/A |
+| 0x1B | ascii_dump | N/A | N/A |
+| 0x1C | get_char | N/A | N/A |
 | 0x1D | (unused) | N/A | N/A |
 | 0x1E | (unused) | N/A | N/A |
 | 0x1F | (unused) | N/A | N/A |
@@ -142,3 +142,4 @@ into si, di, (more to come) respectively, then call `int 0x80`
 | 0x85 | clear_screen |  |  |
 | 0x86 | push_frame |  |  |
 | 0x87 | get_version_number |  |  |
+| 0xA0 | allocate_mem32 |  |  |
